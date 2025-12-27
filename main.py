@@ -40,27 +40,28 @@ def fetch_stooq_daily_close(ticker: str) -> pd.Series:
 # =======================
 # Indicators
 # =======================
-def rsi14(close pd.Series, period int = 14) - float
+def rsi14(close: pd.Series, period: int = 14) -> float:
     delta = close.diff()
     gains = delta.clip(lower=0)
     losses = (-delta).clip(lower=0)
 
-    avg_gain = gains.ewm(alpha=1  period, adjust=False).mean()
-    avg_loss = losses.ewm(alpha=1  period, adjust=False).mean()
+    avg_gain = gains.ewm(alpha=1 / period, adjust=False).mean()
+    avg_loss = losses.ewm(alpha=1 / period, adjust=False).mean()
 
-    rs = avg_gain  avg_loss.replace(0, np.nan)
-    rsi = 100 - (100  (1 + rs))
+    rs = avg_gain / avg_loss.replace(0, np.nan)
+    rsi = 100 - (100 / (1 + rs))
     return float(rsi.iloc[-1])
 
 
-def sma(close pd.Series, window int) - float
+def sma(close: pd.Series, window: int) -> float:
     return float(close.rolling(window).mean().iloc[-1])
 
 
-def pct_return(close pd.Series, trading_days_ago int) - float
-    if len(close) = trading_days_ago
-        raise ValueError(Not enough history)
-    return (float(close.iloc[-1])  float(close.iloc[-1 - trading_days_ago])) - 1.0
+def pct_return(close: pd.Series, trading_days_ago: int) -> float:
+    if len(close) <= trading_days_ago:
+        raise ValueError("Not enough history")
+    return (float(close.iloc[-1]) / float(close.iloc[-1 - trading_days_ago])) - 1.0
+
 
 
 @dataclass
@@ -122,6 +123,7 @@ def main()
     tickers_path = root  tickers.txt
     results_dir = root  results
     docs_dir = root  d_
+
 
 
 
