@@ -21,7 +21,7 @@ def stooq_symbol(ticker: str) -> str:
 
 def fetch_stooq_daily_close(ticker: str) -> pd.Series:
     sym = stooq_symbol(ticker)
-    url = fhttpsstooq.comqdls={sym}&i=d
+url = f"https://stooq.com/q/d/l/?s={sym}&i=d"
     r = requests.get(url, timeout=30)
     r.raise_for_status()
 
@@ -120,6 +120,7 @@ def main()
     tickers_path = root  tickers.txt
     results_dir = root  results
     docs_dir = root  d_
+
 
 
 
