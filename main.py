@@ -15,7 +15,8 @@ import requests
 # Data source STOOQ
 # =======================
 def stooq_symbol(ticker: str) -> str:
-    return f{ticker.lower()}.us
+    return f"{ticker.lower()}.us"
+
 
 
 def fetch_stooq_daily_close(ticker str) - pd.Series
@@ -119,4 +120,5 @@ def main()
     tickers_path = root  tickers.txt
     results_dir = root  results
     docs_dir = root  d_
+
 
