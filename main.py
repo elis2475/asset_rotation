@@ -21,18 +21,20 @@ def stooq_symbol(ticker: str) -> str:
 
 def fetch_stooq_daily_close(ticker: str) -> pd.Series:
     sym = stooq_symbol(ticker)
-url = f"https://stooq.com/q/d/l/?s={sym}&i=d"
+    url = f"https://stooq.com/q/d/l/?s={sym}&i=d"
+
     r = requests.get(url, timeout=30)
     r.raise_for_status()
 
     df = pd.read_csv(io.StringIO(r.text))
-    df[Date] = pd.to_datetime(df[Date])
-    df = df.sort_values(Date).set_index(Date)
+    df["Date"] = pd.to_datetime(df["Date"])
+    df = df.sort_values("Date").set_index("Date")
 
-    if Close not in df.columns or df[Close].dropna().empty
-        raise ValueError(fNo Close data for {ticker})
+    if "Close" not in df.columns or df["Close"].dropna().empty:
+        raise ValueError(f"No Close data for {ticker}")
 
-    return df[Close].astype(float)
+    return df["Close"].astype(float)
+
 
 
 # =======================
@@ -120,6 +122,7 @@ def main()
     tickers_path = root  tickers.txt
     results_dir = root  results
     docs_dir = root  d_
+
 
 
 
