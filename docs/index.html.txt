@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Asset Rotation</title>
+  <style>
+    body { font-family: -apple-system, system-ui, sans-serif; margin: 16px; }
+    h1 { font-size: 20px; margin: 0 0 8px; }
+    .small { color: #666; font-size: 12px; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { padding: 10px 8px; border-bottom: 1px solid #eee; text-align: left; }
+    th { position: sticky; top: 0; background: #fff; z-index: 1; }
+    .red { background: #ffc7ce; }
+    .green { background: #c6efce; }
+    .amber { background: #ffe699; }
+  </style>
+</head>
+<body>
+  <h1>Asset Rotation</h1>
+  <div class="small" id="meta">Loading…</div>
+  <table id="tbl"></table>
+
+<script>
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  const headers = lines[0].split(",").map(h => h.trim());
+  const rows = lines.slice(1).map(line => {
+    // simple CSV split (no quoted commas expected in our output)
+    const parts = line.split(",");
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (parts[i] ?? "").trim());
+    return obj;
+  });
+  return { headers, rows };
+}
+
+function rowClass(row, idx0) {
+  // idx0 is 0-based index in the data section (first data row = 0)
+  const below = (row["Below_200SMA"] || "").toLowerCase();
+  if (below === "yes" || below === "sí" || below === "si") return "red";
+  if (idx0 < 10 && (below === "no" || below === "")) return "green";
+  return "amber";
+}
+
+async function main() {
+  const res = await fetch("./latest.csv", { cache: "no-store" });
+  const text = await res.text();
+  const { headers, rows } = parseCSV(text);
+
+  document.getElementById("meta").textContent =
+    `Updated from latest.csv • Rows: ${rows.length}`;
+
+  const tbl = document.getElementById("tbl");
+
+  // Choose columns to show (edit if you want)
+  const cols = [
+    "Aggregate_Ranking","Ticker","Aggregate_Score",
+    "Perf_3M","Perf_1M","RSI14","Below_200SMA"
+  ];
+
+  // header
+  const thead = document.createElement("thead");
+  const trh = document.createElement("tr");
+  cols.forEach(c => {
+    const th = document.createElement("th");
+    th.textContent = c.replaceAll("_"," ");
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh);
+  tbl.appendChild(thead);
+
+  // body
+  const tbody = document.createElement("tbody");
+  rows.forEach((row, i) => {
+    const tr = document.createElement("tr");
+    tr.className = rowClass(row, i);
+    cols.forEach(c => {
+      const td = document.createElement("td");
+      td.textContent = row[c] ?? "";
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+  tbl.appendChild(tbody);
+}
+main();
+</script>
+</body>
+</html>
